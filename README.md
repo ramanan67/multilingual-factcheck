@@ -105,6 +105,35 @@ means one of these packages hasn't shipped a 3.14 wheel yet; in that case,
 either wait for an update or fall back to Python 3.12/3.13, which have
 broader ML-ecosystem support today.
 
+## Python version
+
+This project targets **Python 3.14.4** (see `.python-version` and the
+Dockerfiles). Note the compatibility caveat below before you build.
+
+### Python 3.14 compatibility note (read before building)
+
+`torch` and `transformers` fully support 3.14 (PyTorch added this in the
+2.10 release). **`chromadb` is the risky one** — as of writing it has open,
+unresolved issues on Python 3.14 caused by:
+- `pydantic` v1/v2 conflicts inside chromadb's own dependency tree
+- `onnxruntime` (a chromadb dependency) not yet shipping 3.14 wheels on
+  every platform
+- `hnswlib` failing to compile from source on some systems when no
+  prebuilt wheel is available
+
+`requirements.txt` pins the highest versions with the best known chance of
+working (`pydantic>=2.12.0`, `chromadb>=1.5.9`). If `pip install -r
+requirements.txt` or `docker compose up --build` fails on the `chromadb`
+step, you have two options:
+
+1. **Fastest fix**: create a separate virtual environment on Python 3.12
+   or 3.13 just for local development, and only use 3.14 for parts that
+   don't touch chromadb. This is genuinely simpler than fighting an
+   immature dependency chain.
+2. **Stay on 3.14.4**: check for a newer `chromadb` release
+   (`pip index versions chromadb`) — this ecosystem is moving fast and a
+   fix may have landed since this was written.
+
 ## Relevance filtering (fixed)
 
 Earlier testing surfaced unrelated articles (e.g. an unrelated entertainment
