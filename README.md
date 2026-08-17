@@ -92,6 +92,19 @@ dashboard.py           -> Streamlit UI
 Dockerfile / Dockerfile.dashboard / docker-compose.yml
 ```
 
+## Python version
+
+This project targets **Python 3.14.4**. Note that Python 3.14 is very
+recent, so several ML dependencies (`torch`, `sentence-transformers`,
+`transformers`, `chromadb`) are pinned with `>=` floors rather than exact
+versions in `requirements.txt` -- this lets `pip` resolve whatever current
+release actually ships a `cp314` wheel, since older exact-pinned versions
+(e.g. `torch==2.4.1`) predate 3.14 support entirely and will fail to
+install. If you hit a dependency resolution error on install, it likely
+means one of these packages hasn't shipped a 3.14 wheel yet; in that case,
+either wait for an update or fall back to Python 3.12/3.13, which have
+broader ML-ecosystem support today.
+
 ## Relevance filtering (fixed)
 
 Earlier testing surfaced unrelated articles (e.g. an unrelated entertainment
