@@ -48,5 +48,5 @@ async def health():
     return {
         "status": "ok",
         "whitelist_size": len(settings.WHITELIST),
-        "code_version": "2024-true-fake-first-flow-2",  # bump this string whenever verdict.py logic changes
+        "code_version": "2024-media-upload-3",  # bump this string whenever verdict.py logic changes
     }

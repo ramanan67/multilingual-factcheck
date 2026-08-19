@@ -36,3 +36,8 @@ class ClaimResponse(BaseModel):
     evidence: List[EvidenceCard]  # only populated when is_true is True
     candidates_considered: int  # how many articles were retrieved before filtering
     filtered_out: int           # how many were dropped as irrelevant (low similarity or NLI-neutral)
+
+
+class MediaClaimResponse(ClaimResponse):
+    extracted_text: str   # what OCR/frame-sampling actually read from the file
+    media_type: str        # "image" | "video"
