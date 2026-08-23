@@ -72,7 +72,7 @@ class Settings:
         "puthiyathalaimurai.com": {
             "name": "Puthiya Thalaimurai",
             "lang": "ta",
-            "rss": "https://www.puthiyathalaimurai.com/feed/",
+            "rss": None, # URL redirects -> scraper fallback
         },
     }
 

@@ -71,7 +71,7 @@ with tab_text:
                     resp = requests.post(
                         f"{API_BASE_URL}/api/check",
                         json={"text": claim_text.strip()},
-                        timeout=60,
+                        timeout=300,
                     )
                     resp.raise_for_status()
                     render_result(resp.json())
