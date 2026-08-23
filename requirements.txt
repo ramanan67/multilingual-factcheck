@@ -20,7 +20,7 @@ python-multipart==0.0.9
 # once chromadb ships a fix -- track it at the issue links above.
 chromadb==0.5.5
 sentence-transformers==3.0.1
-transformers==4.44.2
+transformers=>2.9.0
 torch==2.4.1
 
 # --- Photo / video claim ingestion ---
