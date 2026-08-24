@@ -1,0 +1,34 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+httpx==0.27.2
+feedparser==6.0.11
+beautifulsoup4==4.12.3
+lxml==5.3.0
+python-dotenv==1.0.1
+apscheduler==3.10.4
+streamlit==1.38.0
+requests==2.32.3
+python-multipart==0.0.9
+
+# --- Vector store / ML stack ---
+# NOTE ON PYTHON 3.14: chromadb had an open bug on Python 3.14
+# (chroma-core/chroma#5996, #5983) caused by its dependency on Pydantic
+# v1's compatibility shim. Confirm that's resolved for this chromadb
+# version before switching the Dockerfile off Python 3.12.
+chromadb==0.5.5
+sentence-transformers==3.0.1
+transformers==4.44.2
+
+# torch: unpinned from 2.4.1 to >=2.9.0 -- some platforms/Python versions
+# don't have a matching 2.4.1 wheel available. 2.9.0 requires Python
+# >=3.10 (fine, this project targets 3.12) and is confirmed to exist as a
+# real stable release. If you hit an incompatibility between this and the
+# pinned transformers/sentence-transformers versions above, that's the
+# next thing to check -- they haven't been re-verified together at this
+# torch version.
+torch>=2.9.0
+
+# --- Photo / video claim ingestion ---
+pillow==10.4.0
+pytesseract==0.3.13
+opencv-python-headless==4.10.0.84
