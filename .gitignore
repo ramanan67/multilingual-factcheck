@@ -21,3 +21,5 @@ Thumbs.db
 
 # Streamlit
 .streamlit/secrets.toml
+
+backend/truth_checker.db
