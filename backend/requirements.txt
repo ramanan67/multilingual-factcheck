@@ -18,3 +18,4 @@ opencv-python-headless>=4.8.0
 easyocr>=1.7.0
 scikit-image>=0.22.0
 pytesseract
+python-multipart
