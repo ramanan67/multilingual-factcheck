@@ -4,6 +4,9 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
+    // API Base URL (Supports localhost:8000 when opened via file:/// or custom origin)
+    const API_BASE = (window.location.protocol === "file:" || !window.location.port) && window.location.hostname === "" ? "http://127.0.0.1:8000" : "";
+
     // DOM Elements - Text Form
     const form = document.getElementById("verificationForm");
     const newsInput = document.getElementById("newsInput");
@@ -193,13 +196,13 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const timestamp = Date.now();
             const catParam = currentNewsCategory !== "all" ? `&category=${encodeURIComponent(currentNewsCategory)}` : "";
-            const response = await fetch(`/api/latest-news?limit=12${catParam}&t=${timestamp}`, { cache: "no-store" });
+            const response = await fetch(`${API_BASE}/api/latest-news?limit=12${catParam}&t=${timestamp}`, { cache: "no-store" });
             if (!response.ok) throw new Error("Failed to load latest news");
             const items = await response.json();
             renderLatestNews(items);
         } catch (err) {
             console.error("Latest news error:", err);
-            latestNewsGrid.innerHTML = `<div class="news-loading-placeholder" style="color:var(--text-muted);">Could not fetch live feeds. Click Refresh to try again.</div>`;
+            latestNewsGrid.innerHTML = `<div class="news-loading-placeholder" style="color:var(--text-muted);">Could not fetch live feeds. Ensure server is running at http://localhost:8000.</div>`;
         } finally {
             if (refreshNewsBtn) {
                 refreshNewsBtn.classList.remove("loading");
@@ -381,7 +384,7 @@ document.addEventListener("DOMContentLoaded", () => {
             formData.append("file", selectedMediaFile);
             formData.append("language", mediaLanguageSelect.value);
 
-            const response = await fetch("/api/check-media", {
+            const response = await fetch(`${API_BASE}/api/check-media`, {
                 method: "POST",
                 body: formData
             });
@@ -396,7 +399,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
             console.error("Media verification error:", error);
-            showToast(`Media analysis failed: ${error.message}`, "error");
+            const msg = error.message && error.message.includes("Failed to fetch")
+                ? "Cannot connect to server. Please ensure backend is running at http://localhost:8000."
+                : `Media analysis failed: ${error.message}`;
+            showToast(msg, "error");
             stopLoading();
         } finally {
             mediaSubmitBtn.disabled = false;
@@ -423,13 +429,13 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             let response;
             if (url && !text) {
-                response = await fetch("/api/check-url", {
+                response = await fetch(`${API_BASE}/api/check-url`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ url, language })
                 });
             } else {
-                response = await fetch("/api/check", {
+                response = await fetch(`${API_BASE}/api/check`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ text, url: url || null, language })
@@ -446,7 +452,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
             console.error("Verification error:", error);
-            showToast(`Verification failed: ${error.message}`, "error");
+            const msg = error.message && error.message.includes("Failed to fetch")
+                ? "Cannot connect to backend server. Make sure the server is running at http://localhost:8000."
+                : `Verification failed: ${error.message}`;
+            showToast(msg, "error");
             stopLoading();
         }
     });
@@ -728,11 +737,11 @@ document.addEventListener("DOMContentLoaded", () => {
         sourcesListContainer.innerHTML = `<div style="text-align:center;padding:1rem;">Loading sources...</div>`;
 
         try {
-            const resp = await fetch("/api/sources");
+            const resp = await fetch(`${API_BASE}/api/sources`);
             const sources = await resp.json();
             renderSourcesList(sources);
         } catch (err) {
-            sourcesListContainer.innerHTML = `<div style="color:red;">Failed to load sources.</div>`;
+            sourcesListContainer.innerHTML = `<div style="color:red;padding:1rem;">Failed to connect to backend server. Make sure http://localhost:8000 is active.</div>`;
         }
     });
 
@@ -756,7 +765,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             item.querySelector(".source-toggle-cb").addEventListener("change", async (e) => {
                 const checked = e.target.checked;
-                await fetch(`/api/sources/${s.id}/toggle`, {
+                await fetch(`${API_BASE}/api/sources/${s.id}/toggle`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ enabled: checked })
@@ -772,11 +781,11 @@ document.addEventListener("DOMContentLoaded", () => {
         historyListContainer.innerHTML = `<div style="text-align:center;padding:1rem;">Loading history...</div>`;
 
         try {
-            const resp = await fetch("/api/history");
+            const resp = await fetch(`${API_BASE}/api/history`);
             const history = await resp.json();
             renderHistoryList(history);
         } catch (err) {
-            historyListContainer.innerHTML = `<div style="color:red;">Failed to load history.</div>`;
+            historyListContainer.innerHTML = `<div style="color:red;padding:1rem;">Failed to load history from backend server.</div>`;
         }
     });
 
@@ -817,7 +826,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             item.querySelector(".btn-delete-history").addEventListener("click", async (e) => {
                 e.stopPropagation();
-                await fetch(`/api/history/${h.id}`, { method: "DELETE" });
+                await fetch(`${API_BASE}/api/history/${h.id}`, { method: "DELETE" });
                 item.remove();
             });
 
@@ -827,7 +836,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     clearHistoryBtn.addEventListener("click", async () => {
         if (confirm("Are you sure you want to clear all verification history?")) {
-            await fetch("/api/history", { method: "DELETE" });
+            await fetch(`${API_BASE}/api/history`, { method: "DELETE" });
             historyListContainer.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:2rem;">History cleared.</div>`;
         }
     });
