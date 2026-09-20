@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamil & Multilingual News Truth Checker | உண்மை கண்டறியும் தளம்</title>
+    <meta name="description" content="Multilingual fake news detection and news verification web application for English and Tamil news.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light-mode">
+    <!-- Header Navigation -->
+    <header class="app-header">
+        <div class="container header-content">
+            <div class="brand">
+                <div class="brand-icon">🛡️</div>
+                <div>
+                    <h1 class="brand-title">Tamil & Multilingual News Truth Checker</h1>
+                    <p class="brand-tamil-title">செய்தி உண்மை கண்டறியும் தளம்</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button id="themeToggleBtn" class="btn-icon" title="Toggle Theme" aria-label="Toggle Dark/Light Mode">
+                    <span id="themeIcon">🌙</span>
+                </button>
+                <button id="sourcesBtn" class="btn-secondary" title="View News Sources">
+                    <span>📰</span> News Sources
+                </button>
+                <button id="historyBtn" class="btn-secondary" title="Verification History">
+                    <span>📜</span> History
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container main-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-badge">Evidence-Based Fact-Checking Engine</div>
+            <h2 class="hero-title">Verify the news. See the evidence. Know why.</h2>
+            <p class="hero-subtitle">
+                Cross-references news claims across The Hindu, Times of India, BBC, Puthiya Thalaimurai, Dinamalar, Dinamani, BoomLive, Factly, and official government records in English and தமிழ்.
+            </p>
+        </section>
+
+        <!-- LIVE LATEST BREAKING NEWS SECTION (Shown at First) -->
+        <section class="card breaking-news-card" id="latestNewsSection">
+            <div class="breaking-news-header">
+                <div class="breaking-news-title-wrap">
+                    <span class="live-pulse-dot"></span>
+                    <h3 class="breaking-news-title">Live Latest News / நேரலை முக்கிய செய்திகள்</h3>
+                </div>
+                <button id="refreshNewsBtn" class="btn-refresh btn-sm" title="Refresh Live News">
+                    <span class="spin-icon" id="refreshIcon">🔄</span>
+                    <span id="refreshBtnLabel">Refresh</span>
+                </button>
+            </div>
+            <div class="breaking-news-toolbar">
+                <p class="breaking-news-desc">Real-time headlines from official government portals & verified news sources. Click <strong>Verify</strong> to cross-check any news item immediately.</p>
+                <div class="news-category-pills" id="newsCategoryPills">
+                    <button type="button" class="news-pill active" data-cat="all">🌟 All Feeds (அனைத்தும்)</button>
+                    <button type="button" class="news-pill" data-cat="official">🏛️ Official Govt (அரசு அறிவிப்புகள்)</button>
+                    <button type="button" class="news-pill" data-cat="tamil">🇮🇳 Tamil News (தமிழ் செய்திகள்)</button>
+                    <button type="button" class="news-pill" data-cat="national">🇬🇧 National (தேசிய செய்திகள்)</button>
+                </div>
+            </div>
+            <div class="breaking-news-grid" id="latestNewsGrid">
+                <div class="news-loading-placeholder">Loading latest breaking news feeds...</div>
+            </div>
+        </section>
+
+        <!-- Verification Input Card with Tabs -->
+        <section class="card input-card">
+            <!-- Mode Switcher Tabs -->
+            <div class="input-tabs">
+                <button type="button" class="tab-btn active" id="tabTextBtn">
+                    <span>📝</span> Text & URL / செய்தி வாக்கியம்
+                </button>
+                <button type="button" class="tab-btn" id="tabMediaBtn">
+                    <span>📷</span> Upload Screenshot, Poster or Video / படம் & வீடியோ
+                </button>
+            </div>
+
+            <!-- Tab 1: Text & URL Form -->
+            <form id="verificationForm" class="tab-content active">
+                <div class="form-group">
+                    <label for="newsInput" class="input-label">
+                        <span>Enter News Claim, Headline or Article</span>
+                        <span class="label-hint">English or தமிழ்</span>
+                    </label>
+                    <textarea 
+                        id="newsInput" 
+                        rows="4" 
+                        placeholder="Paste your news claim, headline or article text here... (e.g., Chennai schools closed tomorrow due to heavy rain / விஜய் திரிஷா திருமணம் வதந்தி)"
+                    ></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-2">
+                        <label for="urlInput" class="input-label">
+                            <span>News Article URL</span>
+                            <span class="label-optional">(Optional)</span>
+                        </label>
+                        <input 
+                            type="url" 
+                            id="urlInput" 
+                            placeholder="https://example.com/news-article..."
+                        >
+                    </div>
+
+                    <div class="form-group flex-1">
+                        <label for="languageSelect" class="input-label">Language Mode</label>
+                        <select id="languageSelect">
+                            <option value="auto">🌐 Auto Detect (தானியங்கி)</option>
+                            <option value="en">🇬🇧 English</option>
+                            <option value="ta">🇮🇳 தமிழ் (Tamil)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Sample Prompts / Quick Test Chips -->
+                <div class="sample-chips-container">
+                    <span class="chips-label">Try sample claims:</span>
+                    <div class="chips-list">
+                        <button type="button" class="chip" data-claim="Actor Vijay married actress Trisha on June 20.">
+                            🎬 Vijay & Trisha Marriage (Viral Hoax)
+                        </button>
+                        <button type="button" class="chip" data-claim="Chennai schools closed tomorrow because of heavy rain.">
+                            🌧️ Chennai Rain Holiday (EN)
+                        </button>
+                        <button type="button" class="chip" data-claim="சென்னையில் நாளை கனமழை காரணமாக பள்ளிகளுக்கு விடுமுறை அறிவிப்பு.">
+                            🌧️ சென்னை பள்ளி விடுமுறை (TA)
+                        </button>
+                        <button type="button" class="chip" data-claim="Government announces free electricity for all citizens across India.">
+                            ⚡ Free Electricity Policy (Fake Claim)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="form-actions">
+                    <button type="submit" id="submitBtn" class="btn-primary">
+                        <span class="btn-icon-inner">🔍</span>
+                        <span id="btnText">CHECK NEWS / சரிபார்க்கவும்</span>
+                    </button>
+                    <button type="button" id="clearBtn" class="btn-ghost">Clear</button>
+                </div>
+            </form>
+
+            <!-- Tab 2: Media Upload Form (Images & Videos) -->
+            <form id="mediaForm" class="tab-content hidden">
+                <div class="upload-dropzone" id="dropZone">
+                    <input type="file" id="mediaFileInput" accept="image/*,video/*" class="file-input-hidden">
+                    <div class="dropzone-inner" id="dropzonePrompt">
+                        <span class="upload-icon">📤</span>
+                        <h4>Drag & Drop Viral News Screenshot, Poster or Video</h4>
+                        <p>Upload WhatsApp forward screenshots, news channel cards, posters, or MP4 videos.</p>
+                        <button type="button" class="btn-secondary" id="browseFileBtn">Browse File</button>
+                        <span class="upload-formats">Supported: PNG, JPG, WEBP, MP4, WEBM, MOV (Max 50MB)</span>
+                    </div>
+
+                    <!-- Media Preview Container -->
+                    <div id="mediaPreviewContainer" class="media-preview-container hidden">
+                        <div class="preview-media-wrapper" id="previewMediaWrapper"></div>
+                        <div class="preview-details">
+                            <span id="previewFileName" class="preview-filename">image.png</span>
+                            <span id="previewFileSize" class="preview-filesize">0 KB</span>
+                            <button type="button" id="removeMediaBtn" class="btn-ghost btn-sm">❌ Remove File</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row" style="margin-top: 1rem;">
+                    <div class="form-group flex-1">
+                        <label for="mediaLanguageSelect" class="input-label">Language Mode</label>
+                        <select id="mediaLanguageSelect">
+                            <option value="auto">🌐 Auto Detect (தானியங்கி OCR)</option>
+                            <option value="en">🇬🇧 English</option>
+                            <option value="ta">🇮🇳 தமிழ் (Tamil)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" id="mediaSubmitBtn" class="btn-primary">
+                        <span class="btn-icon-inner">🔍</span>
+                        <span id="mediaBtnText">ANALYZE & VERIFY MEDIA / சரிபார்க்கவும்</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Loading Progress Stepper Screen -->
+        <section id="loadingSection" class="card loading-card hidden" aria-live="polite">
+            <div class="loading-header">
+                <div class="spinner"></div>
+                <div>
+                    <h3 class="loading-title">Verifying News Claim Across Sources...</h3>
+                    <p class="loading-subtitle">Searching news registries, fact-checking portals, and comparing evidence...</p>
+                </div>
+            </div>
+
+            <div class="stepper">
+                <div class="step-item" id="step-1"><span class="step-icon">⏳</span> 1. Reading input & normalizing text</div>
+                <div class="step-item" id="step-2"><span class="step-icon">⏳</span> 2. Detecting language (English / தமிழ்)</div>
+                <div class="step-item" id="step-3"><span class="step-icon">⏳</span> 3. Extracting main claim & public entities</div>
+                <div class="step-item" id="step-4"><span class="step-icon">⏳</span> 4. Generating fact-check & debunk queries</div>
+                <div class="step-item" id="step-5"><span class="step-icon">⏳</span> 5. Searching National, Tamil & Fact-Check sources</div>
+                <div class="step-item" id="step-6"><span class="step-icon">⏳</span> 6. Collecting and parsing articles</div>
+                <div class="step-item" id="step-7"><span class="step-icon">⏳</span> 7. Analyzing evidence polarity & stances</div>
+                <div class="step-item" id="step-8"><span class="step-icon">⏳</span> 8. Detecting duplicate / syndicated reports</div>
+                <div class="step-item" id="step-9"><span class="step-icon">⏳</span> 9. Checking primary government sources</div>
+                <div class="step-item" id="step-10"><span class="step-icon">⏳</span> 10. Calculating final explainable verdict</div>
+            </div>
+        </section>
+
+        <!-- Verification Results Dashboard -->
+        <section id="resultSection" class="result-section hidden">
+            <!-- OCR Extracted Text Notification Box -->
+            <div id="mediaOcrBanner" class="card media-ocr-banner hidden">
+                <div class="media-ocr-header">
+                    <span class="ocr-icon">🔍</span>
+                    <div>
+                        <strong>Multimodal OCR Extracted Text</strong>
+                        <span id="mediaOcrTypeBadge" class="ocr-badge">Image OCR</span>
+                    </div>
+                </div>
+                <p id="mediaOcrContent" class="media-ocr-content"></p>
+            </div>
+
+            <!-- Verdict Hero Banner -->
+            <div id="verdictBanner" class="card verdict-card verdict-false">
+                <div class="verdict-main">
+                    <div id="verdictBadgeIcon" class="verdict-icon">🔴</div>
+                    <div class="verdict-title-group">
+                        <div class="verdict-badge-label" id="verdictBadgeLabel">🔴 FAKE / FALSE (போலிச் செய்தி)</div>
+                        <h2 class="verdict-headline" id="verdictTitle">Classified as Fake News / Fabricated Rumor</h2>
+                    </div>
+                </div>
+
+                <!-- Confidence Box -->
+                <div class="confidence-box">
+                    <div class="confidence-header">
+                        <span>Confidence Score</span>
+                        <strong id="confidenceValue">94.0%</strong>
+                    </div>
+                    <div class="confidence-meter">
+                        <div id="confidenceBar" class="confidence-fill" style="width: 94%;"></div>
+                    </div>
+                    <p class="confidence-disclaimer">
+                        * Confidence is an evidence-backed calculation based on cross-source corroboration and public records.
+                    </p>
+                </div>
+
+                <!-- Claim Quote Box -->
+                <div class="claim-quote-box">
+                    <span class="claim-quote-tag">Analyzed Claim</span>
+                    <p id="resultClaimText" class="claim-quote-content">"Cm vijay is married actress trish at june 20"</p>
+                </div>
+
+                <!-- DEDICATED FACT-CHECK EXECUTIVE SUMMARY CARD -->
+                <div id="executiveSummaryCard" class="executive-summary-card">
+                    <div class="exec-summary-header">
+                        <span class="exec-icon">📋</span>
+                        <h3 class="exec-title" id="execHeadline">Fact-Check Executive Summary</h3>
+                    </div>
+                    <div class="exec-body">
+                        <div class="exec-row">
+                            <span class="exec-label" id="execLabelClaim">Claimed Assertion:</span>
+                            <span class="exec-val" id="execClaimedEvent">"Cm vijay is married actress trish at june 20"</span>
+                        </div>
+                        <div class="exec-row highlight-reality">
+                            <span class="exec-label" id="execLabelReality">Factual Reality:</span>
+                            <span class="exec-val" id="execFactualReality">No such event took place. This is an unfounded viral social media rumor.</span>
+                        </div>
+                        <div class="exec-reasons-block">
+                            <span class="exec-label" id="execLabelReasons">Why is this Fake / Verdict Justification:</span>
+                            <ul id="execKeyReasonsList" class="exec-reasons-list">
+                                <!-- Populated dynamically -->
+                            </ul>
+                        </div>
+                        <div class="exec-advisory" id="execAdvisory">
+                            ⚠️ Unfounded Rumor. This information is false and should not be circulated.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Why Section -->
+                <div class="why-box">
+                    <h3 class="why-title" id="execWhyTitle">💡 Why did the system reach this conclusion?</h3>
+                    <p id="resultReasonText" class="why-summary"></p>
+                    <div id="resultDetailedExplanation" class="why-details"></div>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="verdict-actions">
+                    <button id="shareBtn" class="btn-secondary btn-sm">🔗 Share Verification</button>
+                    <button id="printBtn" class="btn-secondary btn-sm">🖨️ Print Report</button>
+                </div>
+            </div>
+
+            <!-- Stats & Independence Breakdown Grid -->
+            <div class="stats-grid">
+                <div class="card stat-card">
+                    <span class="stat-icon">📑</span>
+                    <div class="stat-number" id="statTotalArticles">0</div>
+                    <div class="stat-label">Total Articles Found</div>
+                </div>
+                <div class="card stat-card">
+                    <span class="stat-icon">🏛️</span>
+                    <div class="stat-number" id="statIndependent">0</div>
+                    <div class="stat-label">Independent Reports</div>
+                </div>
+                <div class="card stat-card">
+                    <span class="stat-icon">🔄</span>
+                    <div class="stat-number" id="statSyndicated">0</div>
+                    <div class="stat-label">Syndicated / Wire Copies</div>
+                </div>
+                <div class="card stat-card">
+                    <span class="stat-icon">🏛️</span>
+                    <div class="stat-number" id="statPrimary">0</div>
+                    <div class="stat-label">Primary / Govt Sources</div>
+                </div>
+            </div>
+
+            <!-- Source Comparison Matrix Table -->
+            <div class="card table-card">
+                <div class="card-header">
+                    <h3 class="card-title">📊 Source Comparison Matrix</h3>
+                    <span class="card-subtitle">Detailed corroboration breakdown across monitored news organizations</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="comparison-table" id="comparisonTable">
+                        <thead>
+                            <tr>
+                                <th>Source</th>
+                                <th>Found</th>
+                                <th>Supports</th>
+                                <th>Contradicts</th>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Reliability</th>
+                                <th>Article</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comparisonTableBody">
+                            <!-- Populated via app.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Collected Articles List -->
+            <div class="articles-section">
+                <div class="articles-header">
+                    <h3 class="card-title">📰 Retrieved Articles & Evidence Snippets</h3>
+                    <div class="filter-pills">
+                        <button class="pill active" data-filter="all">All Articles (<span id="filterAllCount">0</span>)</button>
+                        <button class="pill" data-filter="supports">Supporting (<span id="filterSupportsCount">0</span>)</button>
+                        <button class="pill" data-filter="contradicts">Contradicting (<span id="filterContradictsCount">0</span>)</button>
+                    </div>
+                </div>
+
+                <div class="articles-grid" id="articlesGrid">
+                    <!-- Populated via app.js -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Source Registry Modal -->
+    <div id="sourcesModal" class="modal hidden" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">📰 Registered News & Fact-Checking Sources</h3>
+                <button id="closeSourcesModal" class="btn-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">
+                    The verification engine searches and cross-references across these configured news organizations, fact-checking portals, and primary sources.
+                </p>
+                <div class="sources-list" id="sourcesListContainer">
+                    <!-- Populated via app.js -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Modal / Drawer -->
+    <div id="historyModal" class="modal hidden" role="dialog" aria-modal="true">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3 class="modal-title">📜 Verification History</h3>
+                <div class="modal-header-actions">
+                    <button id="clearHistoryBtn" class="btn-ghost btn-sm">Clear All History</button>
+                    <button id="closeHistoryModal" class="btn-close">&times;</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div id="historyListContainer" class="history-list">
+                    <!-- Populated via app.js -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="container footer-content">
+            <p>
+                <strong>Tamil & Multilingual News Truth Checker</strong> &copy; 2026. 
+                Built to combat misinformation with evidence-based verification.
+            </p>
+            <p class="footer-note">
+                Respects copyright, robots.txt, and terms of service.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
