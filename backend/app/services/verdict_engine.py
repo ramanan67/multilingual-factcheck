@@ -99,10 +99,11 @@ class VerdictEngine:
             verdict = VerdictType.FALSE
             verdict_display = "🔴 FAKE / FALSE (போலிச் செய்தி)" if is_tamil else "🔴 FAKE / FALSE"
             
-            base_conf = 0.85 + min(0.12, (independent_contradicting * 0.04))
-            if has_primary_contradiction:
-                base_conf = max(base_conf, 0.96)
-            confidence = min(0.98, base_conf)
+            if has_primary_contradiction or independent_contradicting >= 2:
+                confidence = 1.0
+            else:
+                base_conf = 0.90 + min(0.08, (independent_contradicting * 0.05))
+                confidence = round(min(1.0, base_conf), 2)
             
             sources_str = ", ".join(contradicting_sources[:3])
             
@@ -273,14 +274,15 @@ class VerdictEngine:
             verdict = VerdictType.TRUE
             verdict_display = "🟢 VERIFIED TRUE (உண்மை செய்தி)" if is_tamil else "🟢 VERIFIED TRUE"
             
-            if independent_supporting >= 2 or has_primary_support:
-                base_conf = 0.82 + min(0.16, (independent_supporting * 0.04))
-                if has_primary_support:
-                    base_conf = max(base_conf, 0.94)
-                confidence = min(0.98, base_conf)
+            if has_primary_support or independent_supporting >= 3:
+                # 100% Confirmed Authentic with official govt portal or 3+ independent mainstream sources
+                confidence = 1.0
+            elif independent_supporting == 2:
+                top_rel = max((a.relevance_score for a in supporting_articles), default=0.7)
+                confidence = 1.0 if top_rel >= 0.60 else 0.95
             else:
                 top_rel = max((a.relevance_score for a in supporting_articles), default=0.7)
-                confidence = round(min(0.92, 0.75 + (top_rel * 0.18)), 2)
+                confidence = round(min(0.95, 0.80 + (top_rel * 0.20)), 2)
             
             sources_str = ", ".join(supporting_sources[:3])
             
